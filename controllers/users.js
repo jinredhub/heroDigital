@@ -1,16 +1,19 @@
 var express = require("express");
 
-// this creates a router as a module
 var router = express.Router();
 
 router.post('/user-info', function(req, res){
     console.log('express submit route');
-    console.log('req.body: ', req.body);
+    // console.log('req.body: ', req.body);
+    console.log('req.query: ', req.query);
 
-    // res.json({ 
-    //     "status": "success", 
-    //     "message": "Thank you. You are now subscribed." 
-    // });
+    res.json({ 
+        "status": "success", 
+        "message": "Thank you. You are now subscribed." 
+    });
+
+    // return 'hi';
+
 });
 
 module.exports = router;

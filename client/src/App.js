@@ -2,6 +2,8 @@
 import React, { Component } from 'react';
 import './App.css';
 
+import axios from 'axios';
+
 import checkSvg from './assests/check.svg';
 
 class App extends Component {
@@ -89,7 +91,7 @@ class App extends Component {
             const patt = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
             const isValidEmail = patt.test(val);
 
-            console.log('email val', isValidEmail);
+            // console.log('email val', isValidEmail);
 
             if(isValidEmail){
                 errorMessage.email = false;
@@ -165,15 +167,15 @@ class App extends Component {
     }
 
     submitFormHandler = (e) =>{
-        console.log('button pressed');
-        // e.preventDefault();
+        // console.log('button pressed');
+        e.preventDefault();
 
         // form validation before submitting data
         const isValidFirstName = this.state.formData.firstName.length > 0 ? true : false;
         const isValidLastName = this.state.formData.lastName.length > 0 ? true : false;
         const patt = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
         const isValidEmail = patt.test(this.state.formData.email);
-        const isValisEuResident = this.state.formData.euResident != 'none' ? true : false;
+        const isValisEuResident = this.state.formData.euResident !== 'none' ? true : false;
 
         // check if at least one checkbox is selected
         const advancesCheckboxVal = this.state.formData.advances;
@@ -186,11 +188,29 @@ class App extends Component {
         }
 
         if(isValidFirstName && isValidLastName && isValidEmail && isValisEuResident && isValidCheckboxes){
-            console.log('submitting form');
+            // console.log('submitting form');
+
+            const data = {
+                firstName: encodeURIComponent(this.state.formData.firstName),
+                lastName: this.state.formData.lastName,
+                email: this.state.formData.email,
+                org: this.state.formData.org,
+                euResident: this.state.formData.euResident,
+                advances: this.state.formData.advances,
+                alerts: this.state.formData.alerts,
+                otherCommunications: this.state.formData.otherCommunications,
+            }
+
+            axios.post('/user-info', null, { params: {
+                firstNNN: 'hi',
+            }})
+            .then(res =>{
+                console.log('res.data', res.data);
+            });
         }
         else{
-            console.log('not submitting form');
-            e.preventDefault();
+            // console.log('not submitting form');
+            // e.preventDefault();
 
             // show error messages
             const errorMessage = {...this.state.errorMessage};
@@ -208,8 +228,7 @@ class App extends Component {
     }
 
     resetFormHandler = (e) =>{
-        console.log('resetting');
-        e.preventDefault();
+        // console.log('resetting');
 
         this.setState({
             formData: {
@@ -310,7 +329,7 @@ class App extends Component {
                         
                         <div style={{paddingTop: '20px'}}></div>
 
-                        {/* atLeastOneCheckbox */}
+                        {/* error message for checkbox */}
                         <div className='errorMessage'>{this.state.errorMessage.atLeastOneCheckbox ? 'One or more options are required' : null}</div>
 
                         <div className='displayFlex flexWrap-wrap'>    
@@ -322,7 +341,10 @@ class App extends Component {
                                         onChange={(ev)=>this.inputHandler(ev, 'advances')} 
                                         checked={this.state.formData.advances}
                                     />
-                                    <div className='faceCheckboxBox' style={{backgroundColor: this.state.formData.advances ? '#803093' : 'white'}}>
+                                    <div className='faceCheckboxBox' style={{
+                                        backgroundColor: this.state.formData.advances ? '#803093' : 'white',
+                                        border: this.state.formData.advances ? 'none' : '3px solid #cfe7e5',
+                                    }}>
                                         {this.state.formData.advances ? <img src={checkSvg} alt="check"/> : null}
                                     </div>
                                     <div className='checkboxLabelText'>ADVANCES</div>
@@ -337,7 +359,10 @@ class App extends Component {
                                         onChange={(ev)=>this.inputHandler(ev, 'alerts')} 
                                         checked={this.state.formData.alerts}
                                     />
-                                    <div className='faceCheckboxBox' style={{backgroundColor: this.state.formData.alerts ? '#803093' : 'white'}}>
+                                    <div className='faceCheckboxBox' style={{
+                                        backgroundColor: this.state.formData.alerts ? '#803093' : 'white',
+                                        border: this.state.formData.alerts ? 'none' : '3px solid #cfe7e5',
+                                    }}>                                        
                                         {this.state.formData.alerts ? <img src={checkSvg} alt="check"/> : null}
                                     </div>
                                     <div className='checkboxLabelText'>ALERTS</div>
@@ -352,19 +377,18 @@ class App extends Component {
                                         onChange={(ev)=>this.inputHandler(ev, 'otherCommunications')} 
                                         checked={this.state.formData.otherCommunications}
                                     />
-                                    <div className='faceCheckboxBox' style={{backgroundColor: this.state.formData.otherCommunications ? '#803093' : 'white'}}>
+                                    <div className='faceCheckboxBox' style={{
+                                        backgroundColor: this.state.formData.otherCommunications ? '#803093' : 'white',
+                                        border: this.state.formData.otherCommunications ? 'none' : '3px solid #cfe7e5',
+                                    }}>                                        
                                         {this.state.formData.otherCommunications ? <img src={checkSvg} alt="check"/> : null}
                                     </div>
                                     <div className='checkboxLabelText'>OTHER COMMUNICATIONS</div>
                                 </label>
                             </div>
-                        </div>
+                        </div>                        
 
-                        <div style={{paddingTop: '20px'}}></div>
-
-                        
-
-                        <div style={{paddingTop: '60px'}}></div>
+                        <div style={{paddingTop: '80px'}}></div>
 
                         <button type='submit' onClick={this.submitFormHandler} className='submitButton'>SUBMIT</button>
                         <button type='button' onClick={this.resetFormHandler} className='resetButton'>RESET</button>
