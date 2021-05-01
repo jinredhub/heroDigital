@@ -8,6 +8,9 @@ import checkSvg from './assests/check.svg';
 
 class App extends Component {
     state = {
+        showForm: true,
+        showResponseMessage: false,
+        responseMessage: '',
         formData: {
             firstName: '',
             lastName: '',
@@ -145,6 +148,24 @@ class App extends Component {
             this.setState({
                 formData: formData
             });
+
+            // show/hide error message
+            if(formData.advances || formData.alerts || formData.otherCommunications){
+                const errorMessage = {...this.state.errorMessage};
+                errorMessage.atLeastOneCheckbox = false;
+
+                this.setState({
+                    errorMessage: errorMessage
+                });
+            }
+            else{
+                const errorMessage = {...this.state.errorMessage};
+                errorMessage.atLeastOneCheckbox = true;
+
+                this.setState({
+                    errorMessage: errorMessage
+                });
+            }
         }
         else if(inputType === 'alerts'){
             const val = e.target.checked;
@@ -154,6 +175,24 @@ class App extends Component {
             this.setState({
                 formData: formData
             });
+
+            // show/hide error message
+            if(formData.advances || formData.alerts || formData.otherCommunications){
+                const errorMessage = {...this.state.errorMessage};
+                errorMessage.atLeastOneCheckbox = false;
+
+                this.setState({
+                    errorMessage: errorMessage
+                });
+            }
+            else{
+                const errorMessage = {...this.state.errorMessage};
+                errorMessage.atLeastOneCheckbox = true;
+
+                this.setState({
+                    errorMessage: errorMessage
+                });
+            }
         }
         else if(inputType === 'otherCommunications'){
             const val = e.target.checked;
@@ -163,6 +202,24 @@ class App extends Component {
             this.setState({
                 formData: formData
             });
+
+            // show/hide error message
+            if(formData.advances || formData.alerts || formData.otherCommunications){
+                const errorMessage = {...this.state.errorMessage};
+                errorMessage.atLeastOneCheckbox = false;
+
+                this.setState({
+                    errorMessage: errorMessage
+                });
+            }
+            else{
+                const errorMessage = {...this.state.errorMessage};
+                errorMessage.atLeastOneCheckbox = true;
+
+                this.setState({
+                    errorMessage: errorMessage
+                });
+            }
         }
     }
 
@@ -190,22 +247,26 @@ class App extends Component {
         if(isValidFirstName && isValidLastName && isValidEmail && isValisEuResident && isValidCheckboxes){
             // console.log('submitting form');
 
-            const data = {
-                firstName: encodeURIComponent(this.state.formData.firstName),
-                lastName: this.state.formData.lastName,
-                email: this.state.formData.email,
-                org: this.state.formData.org,
-                euResident: this.state.formData.euResident,
-                advances: this.state.formData.advances,
-                alerts: this.state.formData.alerts,
-                otherCommunications: this.state.formData.otherCommunications,
-            }
-
             axios.post('/user-info', null, { params: {
-                firstNNN: 'hi',
+                firstName: encodeURIComponent(this.state.formData.firstName),
+                lastName: encodeURIComponent(this.state.formData.lastName),
+                email: encodeURIComponent(this.state.formData.email),
+                org: encodeURIComponent(this.state.formData.org),
+                euResident: encodeURIComponent(this.state.formData.euResident),
+                advances: encodeURIComponent(this.state.formData.advances),
+                alerts: encodeURIComponent(this.state.formData.alerts),
+                otherCommunications: encodeURIComponent(this.state.formData.otherCommunications),           
             }})
             .then(res =>{
-                console.log('res.data', res.data);
+                // console.log('res.data', res.data);
+
+                if(res.data.status === 'success'){
+                    this.setState({
+                        showForm: false,
+                        showResponseMessage: true,
+                        responseMessage: res.data.message,
+                    });
+                }
             });
         }
         else{
@@ -253,149 +314,160 @@ class App extends Component {
 
     render() {
         console.log('state======================', this.state);
+        
         return (
             <div className='App'>
                 <section>
-                    <h1>Sign up for email updates</h1>
-                    <div style={{color: 'gray'}}>*indicates Required Field</div>
-
-                    <form method='POST' action="/user-info" encType='application/x-www-form-urlencoded'>
-                        <div className='displayFlex'>
-                            <div className='flex50'>
-                                <div className='errorMessage'>{this.state.errorMessage.firstName ? 'First name is required' : null}</div>
-                                <label htmlFor="firstName" className='textInputLabelText'>FIRST NAME*</label>
-                                <input type="text"
-                                    name='firstName'
-                                    id='firstName'
-                                    onChange={(ev)=>this.inputHandler(ev, 'firstName')}
-                                    value={this.state.formData.firstName}
-                                    className={this.state.errorMessage.firstName ? 'errorInputStyle' : null}
-                                />
-                            </div>
-
-                            <div className='flex50'>
-                                <div className='errorMessage'>{this.state.errorMessage.lastName ? 'Last name is required' : null}</div>
-                                <label htmlFor="lastName" className='textInputLabelText'>LAST NAME*</label>
-                                <input type="text"
-                                    name='lastName'
-                                    id='lastName'
-                                    onChange={(ev)=>this.inputHandler(ev, 'lastName')}
-                                    value={this.state.formData.lastName}
-                                    className={this.state.errorMessage.lastName ? 'errorInputStyle' : null}
-                                />
-                            </div>
-                        </div>
-                        
-                        <div className='displayFlex'>
-                            <div className='flex50'>
-                                <div className='errorMessage'>{this.state.errorMessage.email ? 'Email address is required' : null}</div>
-                                <label htmlFor="email" className='textInputLabelText'>EMAIL ADDRESS*</label>
-                                <input type="text"
-                                    name='email'
-                                    id='email'
-                                    onChange={(ev)=>this.inputHandler(ev, 'email')}
-                                    value={this.state.formData.email}
-                                    className={this.state.errorMessage.email ? 'errorInputStyle' : null}
-                                />
-                            </div>
-
-                            <div className='flex50'>
-                                <div className='errorMessage'></div>
-                                <label htmlFor="org" className='textInputLabelText'>ORGANIZATION</label>
-                                <input type="text"
-                                    name='org'
-                                    id='org'
-                                    onChange={(ev)=>this.inputHandler(ev, 'org')}
-                                    value={this.state.formData.org}
-                                />
-                            </div>
-                        </div>
-
+                    {this.state.showForm ? (
                         <div>
-                            <div className='errorMessage'>{this.state.errorMessage.euResident ? 'EU resident is required' : null}</div>
-                            <label htmlFor="euResident" className='selectLabelText'>EU RESIDENT*</label><br/>
-                            <select name="euResident" 
-                                id="euResident"
-                                onChange={(ev)=>this.inputHandler(ev, 'euResident')}
-                                value={this.state.formData.euResident}
-                                className={this.state.errorMessage.euResident ? 'errorInputStyle' : null}
-                            >
-                                <option value="none">- SELECT ONE -</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                            </select>
+                            <h1>Sign up for email updates</h1>
+                            <div style={{color: 'gray'}}>*indicates Required Field</div>
+
+                            <form method='POST' action="/user-info" encType='application/x-www-form-urlencoded'>
+                                <div className='displayFlex'>
+                                    <div className='flex50'>
+                                        <div className='errorMessage'>{this.state.errorMessage.firstName ? 'First name is required' : null}</div>
+                                        <label htmlFor="firstName" className='textInputLabelText'>FIRST NAME*</label>
+                                        <input type="text"
+                                            name='firstName'
+                                            id='firstName'
+                                            onChange={(ev)=>this.inputHandler(ev, 'firstName')}
+                                            value={this.state.formData.firstName}
+                                            className={this.state.errorMessage.firstName ? 'errorInputStyle' : null}
+                                        />
+                                    </div>
+
+                                    <div className='flex50'>
+                                        <div className='errorMessage'>{this.state.errorMessage.lastName ? 'Last name is required' : null}</div>
+                                        <label htmlFor="lastName" className='textInputLabelText'>LAST NAME*</label>
+                                        <input type="text"
+                                            name='lastName'
+                                            id='lastName'
+                                            onChange={(ev)=>this.inputHandler(ev, 'lastName')}
+                                            value={this.state.formData.lastName}
+                                            className={this.state.errorMessage.lastName ? 'errorInputStyle' : null}
+                                        />
+                                    </div>
+                                </div>
+                                
+                                <div className='displayFlex'>
+                                    <div className='flex50'>
+                                        <div className='errorMessage'>{this.state.errorMessage.email ? 'Email address is required' : null}</div>
+                                        <label htmlFor="email" className='textInputLabelText'>EMAIL ADDRESS*</label>
+                                        <input type="text"
+                                            name='email'
+                                            id='email'
+                                            onChange={(ev)=>this.inputHandler(ev, 'email')}
+                                            value={this.state.formData.email}
+                                            className={this.state.errorMessage.email ? 'errorInputStyle' : null}
+                                        />
+                                    </div>
+
+                                    <div className='flex50'>
+                                        <div className='errorMessage'></div>
+                                        <label htmlFor="org" className='textInputLabelText'>ORGANIZATION</label>
+                                        <input type="text"
+                                            name='org'
+                                            id='org'
+                                            onChange={(ev)=>this.inputHandler(ev, 'org')}
+                                            value={this.state.formData.org}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div className='errorMessage'>{this.state.errorMessage.euResident ? 'EU resident is required' : null}</div>
+                                    <label htmlFor="euResident" className='selectLabelText'>EU RESIDENT*</label><br/>
+                                    <select name="euResident" 
+                                        id="euResident"
+                                        onChange={(ev)=>this.inputHandler(ev, 'euResident')}
+                                        value={this.state.formData.euResident}
+                                        className={this.state.errorMessage.euResident ? 'errorInputStyle' : null}
+                                    >
+                                        <option value="none">- SELECT ONE -</option>
+                                        <option value="yes">Yes</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                </div>
+                                
+                                <div style={{paddingTop: '20px'}}></div>
+
+                                {/* error message for checkbox */}
+                                <div className='errorMessage'>{this.state.errorMessage.atLeastOneCheckbox ? 'One or more options are required' : null}</div>
+
+                                <div className='displayFlex flexWrap-wrap'>    
+                                    <div className='checkboxDiv'>
+                                        <label htmlFor="advances" className='checkboxLabel'>
+                                            <input type="checkbox" 
+                                                name='advances'
+                                                id='advances'
+                                                onChange={(ev)=>this.inputHandler(ev, 'advances')} 
+                                                checked={this.state.formData.advances}
+                                            />
+                                            <div className='faceCheckboxBox' style={{
+                                                backgroundColor: this.state.formData.advances ? '#803093' : 'white',
+                                                border: this.state.formData.advances ? 'none' : '3px solid #cfe7e5',
+                                            }}>
+                                                {this.state.formData.advances ? <img src={checkSvg} alt="check"/> : null}
+                                            </div>
+                                            <div className='checkboxLabelText'>ADVANCES</div>
+                                        </label>
+                                    </div>
+
+                                    <div className='checkboxDiv'>
+                                        <label htmlFor="alerts" className='checkboxLabel'>
+                                            <input type="checkbox" 
+                                                name='alerts'
+                                                id='alerts'
+                                                onChange={(ev)=>this.inputHandler(ev, 'alerts')} 
+                                                checked={this.state.formData.alerts}
+                                            />
+                                            <div className='faceCheckboxBox' style={{
+                                                backgroundColor: this.state.formData.alerts ? '#803093' : 'white',
+                                                border: this.state.formData.alerts ? 'none' : '3px solid #cfe7e5',
+                                            }}>                                        
+                                                {this.state.formData.alerts ? <img src={checkSvg} alt="check"/> : null}
+                                            </div>
+                                            <div className='checkboxLabelText'>ALERTS</div>
+                                        </label>
+                                    </div>
+
+                                    <div className='checkboxDiv'>
+                                        <label htmlFor="otherCommunications" className='checkboxLabel'>
+                                            <input type="checkbox" 
+                                                name='otherCommunications'
+                                                id='otherCommunications'
+                                                onChange={(ev)=>this.inputHandler(ev, 'otherCommunications')} 
+                                                checked={this.state.formData.otherCommunications}
+                                            />
+                                            <div className='faceCheckboxBox' style={{
+                                                backgroundColor: this.state.formData.otherCommunications ? '#803093' : 'white',
+                                                border: this.state.formData.otherCommunications ? 'none' : '3px solid #cfe7e5',
+                                            }}>                                        
+                                                {this.state.formData.otherCommunications ? <img src={checkSvg} alt="check"/> : null}
+                                            </div>
+                                            <div className='checkboxLabelText'>OTHER COMMUNICATIONS</div>
+                                        </label>
+                                    </div>
+                                </div>                        
+
+                                <div style={{paddingTop: '80px'}}></div>
+
+                                <button type='submit' onClick={this.submitFormHandler} className='submitButton'>SUBMIT</button>
+                                <button type='button' onClick={this.resetFormHandler} className='resetButton'>RESET</button>
+
+                                <div style={{paddingTop: '60px'}}></div>
+
+                            </form>
                         </div>
-                        
-                        <div style={{paddingTop: '20px'}}></div>
-
-                        {/* error message for checkbox */}
-                        <div className='errorMessage'>{this.state.errorMessage.atLeastOneCheckbox ? 'One or more options are required' : null}</div>
-
-                        <div className='displayFlex flexWrap-wrap'>    
-                            <div className='checkboxDiv'>
-                                <label htmlFor="advances" className='checkboxLabel'>
-                                    <input type="checkbox" 
-                                        name='advances'
-                                        id='advances'
-                                        onChange={(ev)=>this.inputHandler(ev, 'advances')} 
-                                        checked={this.state.formData.advances}
-                                    />
-                                    <div className='faceCheckboxBox' style={{
-                                        backgroundColor: this.state.formData.advances ? '#803093' : 'white',
-                                        border: this.state.formData.advances ? 'none' : '3px solid #cfe7e5',
-                                    }}>
-                                        {this.state.formData.advances ? <img src={checkSvg} alt="check"/> : null}
-                                    </div>
-                                    <div className='checkboxLabelText'>ADVANCES</div>
-                                </label>
-                            </div>
-
-                            <div className='checkboxDiv'>
-                                <label htmlFor="alerts" className='checkboxLabel'>
-                                    <input type="checkbox" 
-                                        name='alerts'
-                                        id='alerts'
-                                        onChange={(ev)=>this.inputHandler(ev, 'alerts')} 
-                                        checked={this.state.formData.alerts}
-                                    />
-                                    <div className='faceCheckboxBox' style={{
-                                        backgroundColor: this.state.formData.alerts ? '#803093' : 'white',
-                                        border: this.state.formData.alerts ? 'none' : '3px solid #cfe7e5',
-                                    }}>                                        
-                                        {this.state.formData.alerts ? <img src={checkSvg} alt="check"/> : null}
-                                    </div>
-                                    <div className='checkboxLabelText'>ALERTS</div>
-                                </label>
-                            </div>
-
-                            <div className='checkboxDiv'>
-                                <label htmlFor="otherCommunications" className='checkboxLabel'>
-                                    <input type="checkbox" 
-                                        name='otherCommunications'
-                                        id='otherCommunications'
-                                        onChange={(ev)=>this.inputHandler(ev, 'otherCommunications')} 
-                                        checked={this.state.formData.otherCommunications}
-                                    />
-                                    <div className='faceCheckboxBox' style={{
-                                        backgroundColor: this.state.formData.otherCommunications ? '#803093' : 'white',
-                                        border: this.state.formData.otherCommunications ? 'none' : '3px solid #cfe7e5',
-                                    }}>                                        
-                                        {this.state.formData.otherCommunications ? <img src={checkSvg} alt="check"/> : null}
-                                    </div>
-                                    <div className='checkboxLabelText'>OTHER COMMUNICATIONS</div>
-                                </label>
-                            </div>
-                        </div>                        
-
-                        <div style={{paddingTop: '80px'}}></div>
-
-                        <button type='submit' onClick={this.submitFormHandler} className='submitButton'>SUBMIT</button>
-                        <button type='button' onClick={this.resetFormHandler} className='resetButton'>RESET</button>
-
-                        <div style={{paddingTop: '60px'}}></div>
-
-                    </form>
+                        ) : null
+                    }
+                    
+                    {this.state.showResponseMessage ? (
+                        <div className='responseMessageDiv'>
+                            <div className='responseMessage'>{this.state.responseMessage}</div>
+                        </div>
+                    ) : null}
 
                 </section>
             </div>
